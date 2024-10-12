@@ -1,0 +1,14 @@
+@if(activo){
+    <button (click)="activo=false">Cerrar sesión</button>
+    <img (click)="saludar()" src="https://github.com/DGMLX.png" alt="Usuario"/>
+    <h3>Binvenido a la aplicación {{usuario}}</h3>
+    <app-games usuario="{{usuario}}" (addFavoriteEvent)="getJuegoFavorito($event)"></app-games>
+
+    @if(juegoFavorito !== ''){
+        <p>Tu juego favorito es {{juegoFavorito}}</p>
+    }
+
+}@else{
+    <h3>Necesitas iniciar sesión</h3>
+    <button (click)="activo=true">Iniciar sesión</button>
+}

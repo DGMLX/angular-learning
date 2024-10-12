@@ -1,0 +1,8 @@
+@for(game of games;track game.id){
+    <div>
+        <h2>{{game.nombre}}</h2>
+        <p>{{game.precio}}</p>
+        <button (click)="favoritos(game.nombre)">Agregar a favoritos</button>
+        <button (click)="comprar(game.nombre,usuario)">Comprar</button>
+    </div>
+}
