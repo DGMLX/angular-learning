@@ -1,0 +1,98 @@
+- Tener version de node >18
+- Instalar linea de comandos de angular npm install -g @angular/cli
+- ng version (vemos version de la cli instalada)
+- Tener version >17 de angular
+- ng (comando que estaremos usando para todo)
+- ng new [nombreProyecto]
+- Instalamos extension angular service en VSC, ponemos configuracion y habilitar espacio de trabajo
+- main.ts --> punto de entrada de la app
+- style.css --> estilos globales
+- index.html --> <app-root></app-root> raiz de la app
+- carpeta app --> componente principal
+	- app.component.ts --> envuelve a todos los componentes
+	- usamos decorador @Component encargado de describir como sera nuestro componente
+	es importado import {Component} from "@angular/core"
+	- Tenemos el selector : 'app-root' --> etiqueta con la que identificamos este componente, es igual a la que tenemos en html
+	- Standalone : true --> Si queremos utilizar componentes debemos definirlos en imports (recomendado true)
+	- Imports : [...] --> Componentes
+	- templateUrl: 'app.component.html' -->lo que renderiza este componente
+	- styleUrl : 'app.component.css' --> estilos de este componente
+	- Tenemos la class Appcomponent donde podemos crear propiedades y metodos
+	- app.config.ts configuraciones de la app que hemos visto en el punto de entrada
+	- app.routes.ts --> podemos agregar rutas  path:'/about'
+
+- Ejecutamos el sv con ng serve o ng serve --open y nos abre el navegador
+- Podemos directamente en el templateUrl y styleUrl el codigo quitando el Url de la clave 
+- Llamamos a una propiedad con {{nombrePropiedad}}
+
+- Creamos un nuevo componente con ng generate component [nombreComponente]
+	- ng generate component user
+- Usamos <app-user></app-user> en el html del app principal
+- Se debe agregar al Import el UserComponent en app.component.ts
+- Creamos dos propiedades en el class de user
+	- usuario ="Diego"
+	- activo = true
+- Usamos en el html uso de directivas @if(activo){
+						<h2>Bienvenido {{usuario}}</h2>
+					}@else{
+						<h2>Debes iniciar sesión</h2>
+					}
+- Creamos ng generate component games
+- creamos una propiedad de arreglo con juegos con nombre,id y precio llamada games
+- para recorrerlos en el html usamos @for(game of games;track game.id){
+	<p>{{game.nombre}}</p>
+}	
+- lo mostramos en user <app-games></app-games> y ponemos en user.component.ts en el import el GameComponent
+- le agregamos un boton a cada juego <button (click)="comprar(game.nombre)">Comprar</button> con un evento click que ejecuta un metodo comprar
+- Nos saldra un error, hay que definir el metodo, en el class de games ponemos comprar(nombre:string){ alert(`comprando ${nombre}`)}
+
+- Para cambiar el estado de alguna propiedad creamos en el user un boton de iniciar sesion y le agregamos
+	(click) = "active=true" y cerrar sesion (click) = "active= false"
+- Para pasar informacion de padre a hijo, ejemplo de user a games
+- en el user estamos usando el games, <app-games></app-games>, le pasamos directamente la informacion
+	- <app-games usuario="{{usuario}}"></app-games>
+- Nos saldra un error ya que debemos en games.component.ts especificar que estamos enviando esa informacion
+- En la class ponemos (Input es importado de angular/core)
+	@Input() usuario="";
+- Ahora podemos usar usuario en el hijo (games).
+
+- Comunicacion de informacion de hijo a padre (@Output()) ---> importado de angular/core
+	-Ejemplo : Crearemos un metodo que agrega a favoritos un juego (hijo), el juego agregado sera mostrado en la vista de user(padre)
+	creamos en el hijo (games) --> favoritos(nombre:string)
+En el hijo creamos
+ @Output() addFavoriteEvent = new EventEmitter<string>()    -->Evento que sera compartido
+
+- En el metodo favoritos ponemos
+	favoritos(nombre:string){
+		this.addFavoriteEvent.emit(nombre)
+	}
+- Ahora en el padre creamos una propiedad donde se almacenara el juego favorito
+	juegoFavorito = "";
+- Y en el padre tambien necesitamos un metodo que cuando recuperemos el juego favorito se almacene en esa propiedad
+	getFavorito(nombre:string){
+		this.juegoFavorito = nombre;
+	}
+- en el Html del padre ponemos <app-games usuario="{{usuario}}" (addFavoriteEvent) = "getFavorite($event)" --> $event hace referncia al dato que llega del evento en este caso el nombre del juego favorito
+- y en el html del user abajo del <app-games ....></app-games> ponemos
+	@if(juegoFavorito !== ""){
+		<p>Se agrego {{juegoFavorito}} a favoritos</p>
+	}
+
+-Defer (carga diferida de datos)
+	- En el app.component.html creamos un gran texto que sea scrolleable y creamos un nuevo componente comentarios
+	- ng generate component comentarios con un titulo,imagen y descripcion.
+	- Usamos en el app html
+	@defer(on viewport){
+		<app-comentarios></app-comentarios>
+	}@placeholder{
+		<p>Futuros comentarios</p>
+	}@loading{
+		<p>Cargando comentarios...</p>
+	}	
+
+	- El defer carga diferida cuando se cargue todo y no tenga mas trabajo de carga, se carga el componente app-comentario
+	teniendo una prioridad mas baja que la demas carga.
+	- El placeholder hace un hueco de infromacion en el cual ira el contenido, se produce cuando no esta cargando ni 
+	esta ejecutando el defer
+	- El loading es para cuando este cargando los datos aparece ese texto
+	- el on viewport hace la carga bajo demanda (lazy loading)
